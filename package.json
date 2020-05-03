@@ -1,0 +1,23 @@
+{
+  "name": "naver-shop-macro",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/craftyworks/naver-shop-macro.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/craftyworks/naver-shop-macro/issues"
+  },
+  "homepage": "https://github.com/craftyworks/naver-shop-macro#readme",
+  "dependencies": {
+    "puppeteer": "^3.0.2"
+  }
+}
