@@ -1,0 +1,16 @@
+{
+  "name": "naver-shop-macro",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "functions-framework --target=macro",
+    "deploy": "gcloud functions deploy macro --runtime nodejs8 --trigger-http --timeout=300s --memory=1024MB --region=asia-northeast1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/functions-framework": "^1.5.1",
+    "puppeteer": "^2.1.1"
+  }
+}
