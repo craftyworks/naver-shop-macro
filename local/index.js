@@ -1,34 +1,23 @@
 const puppeteer = require('puppeteer');
-const userId = process.env.USER_ID
-const password = process.env.PASSWORD
+const userId = process.env.naver_id
+const password = process.env.naver_password
+console.log(`[${userId}], [${password}]`)
+
 /** 금아 블랙마스크 */
 const product = 'https://smartstore.naver.com/kumaelectron/products/4813999869'
 const test_product = 'https://smartstore.naver.com/kumaelectron/products/4836415470'
 
-if (!process.env.STAGE) process.env.STAGE = 'local'
-
-const getChromeBrowserArgument = async () => {
-  let puppeteerArgument = null
-  if (process.env.STAGE === 'local') {
-    puppeteerArgument = {
-      headless: true,
-      devtools: false,
-      defaultViewport: {width: 1900, height: 900},
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox'
-      ],
-      ignoreDefaultArgs: ['--disable-extensions']
-    }
-  } else {
-    puppeteerArgument = {
-      // args: chromium.args,
-      // executablePath: await chromium.executablePath,
-      // headless: chromium.headless
-    }
-  }
-  return puppeteerArgument
+const browserOptions = {
+  headless: true,
+  devtools: false,
+  defaultViewport: {width: 1900, height: 900},
+  args: [
+    '--no-sandbox',
+    '--disable-setuid-sandbox'
+  ],
+  ignoreDefaultArgs: ['--disable-extensions']
 }
+
 /** 네이버 로그인 */
 const naverLogin = async (page) => {
   try {
@@ -49,16 +38,16 @@ const naverLogin = async (page) => {
     ])
 
     // Check Login Success
-    /*
     const elementHandle = await page.$('iframe#minime');
     const frame = await elementHandle.contentFrame();
     await frame.waitForSelector('div.email');
     const email = await frame.$eval('div.email', el => el.textContent);
     console.log('Naver Login Suceess, %s', email)
-     */
-    console.log('Naver Login Success')
+    return true
   } catch (err) {
-    console.error(err)
+    console.log('Naver Login Failed!!!')
+    console.log(err)
+    return false
   }
 }
 
@@ -95,10 +84,12 @@ const buyProduct = async (page) => {
   let browser = null
   let page = null
   try {
-    browser = await puppeteer.launch(await getChromeBrowserArgument())
+    browser = await puppeteer.launch(browserOptions)
     page = await browser.newPage()
     // Login
-    await naverLogin(page)
+    if (!await naverLogin(page)) {
+      return
+    }
 
     let success = false
     while (!success) {
