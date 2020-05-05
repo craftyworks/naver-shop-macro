@@ -1,5 +1,4 @@
-/* eslint-disable no-await-in-loop */
-const puppeteer = require('puppeteer');
+const chromium = require('chrome-aws-lambda');
 
 const userId = process.env.naver_id
 const password = process.env.naver_password
@@ -29,7 +28,7 @@ const naverLogin = async (page) => {
     await page.goto('https://www.naver.com')
     await page.click('#account > a.link_login')
     await page.waitForSelector('#id')
-    
+
     // await page.type('#id', userId)
     // await page.type('#pw', password)
     /* 네이버 CAPTCHA 무력화 */
@@ -42,6 +41,7 @@ const naverLogin = async (page) => {
       page.click('#log\\.login'),
       page.waitForNavigation({waitUntil: 'networkidle0'})
     ])
+    page.waitFor(3000)
 
     // Check Login Success
     const elementHandle = await page.$('iframe#minime');
@@ -84,16 +84,20 @@ const buyProduct = async (page) => {
   return false
 }
 
-exports.macro = async (req, res) => {
+module.exports.macro = async (event, context) => {
   let browser = null
   let page = null
   try {
-    browser = await puppeteer.launch(browserOptions)
+    browser = await chromium.puppeteer.launch({
+      executablePath: await chromium.executablePath,
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      headless: chromium.headless,
+    })
     page = await browser.newPage()
-    await page.waitFor(5000)
     // Login
     if (await naverLogin(page)) {
-      let count = Number(req.query.count) || 100
+      let count = 100
       let success = false
       while (!success && count-- > 0) {
         // Move Product Page
@@ -105,13 +109,9 @@ exports.macro = async (req, res) => {
           success = await buyProduct(page)
         }
       }
-      res.status(200).send("Firebase Function Compelted!");
-    } else {
-      res.status(500).send("Naver login failed" + imageBuffer)
     }
   } catch (err) {
     console.error(err)
-    res.status(500).send(err)
   } finally {
     if (page !== null) {
       for (let page of await browser.pages()) {
@@ -124,4 +124,12 @@ exports.macro = async (req, res) => {
       await browser.close()
     }
   }
-}
+  return {
+    statusCode: 200,
+    body: JSON.stringify( {
+          message: 'function executed successfully!',
+          input: event,
+        }
+    ),
+  };
+};

@@ -1,0 +1,23 @@
+service: aws-lambda
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: ap-northeast-2
+  environments:
+    naver_id: ddam40
+    nvaer_password: ddam114e!
+package:
+  exclude:
+    - node_modules/puppeteer/.local-chromium/**
+    - node_modules/serverless/**
+
+functions:
+  macro:
+    handler: src/index.macro
+    memorySize: 1536
+    timeout: 30
+    events:
+      - http:
+          path: macro
+          method: get
