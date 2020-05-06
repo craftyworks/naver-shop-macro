@@ -1,0 +1,26 @@
+service: aws-lambda2
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage, 'dev'}
+  region: ap-northeast-2
+  environment:
+    stage: ${self:provider.stage}
+    naver_id: ${file(./config.${self:provider.stage}.json):naver_id}
+    naver_password: ${file(./config.${self:provider.stage}.json):naver_password}
+package:
+  exclude:
+    - node_modules/puppeteer/.local-chromium/**
+
+functions:
+  macro:
+    handler: src/index.macro
+    memorySize: 1536
+    timeout: 30
+    events:
+      - schedule: cron(30-45 0 * * ? *)
+      - http:
+          path: macro
+          method: get
+
+

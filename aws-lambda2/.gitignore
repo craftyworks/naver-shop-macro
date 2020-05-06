@@ -9,5 +9,4 @@ jspm_packages
 .idea
 
 # config
-config.dev.json
-config.prod.json
+config.*.json
