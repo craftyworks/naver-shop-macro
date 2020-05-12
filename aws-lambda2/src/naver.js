@@ -1,5 +1,9 @@
+/** 금아마스크WHITE */
+const kuma_white = 'https://smartstore.naver.com/kumaelectron/products/4922095600'
 /** 금아 블랙마스크 */
-const product = 'https://smartstore.naver.com/kumaelectron/products/4813999869'
+const kuma_black = 'https://smartstore.naver.com/kumaelectron/products/4813999869'
+/** 금아덴탈마스크 */
+const kuma_dental = 'https://smartstore.naver.com/kumaelectron/products/4754238400'
 const test_product = 'https://smartstore.naver.com/kumaelectron/products/4836415470'
 const aer_mask = 'https://smartstore.naver.com/aer-shop/products/4722827602'
 
@@ -69,6 +73,6 @@ const buyProduct = async (page) => {
   return false
 }
 
-module.exports.product = aer_mask
+module.exports.product = kuma_white
 module.exports.login = login
 module.exports.buyProduct = buyProduct

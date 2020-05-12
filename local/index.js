@@ -5,8 +5,10 @@ console.log(`[${userId}], [${password}]`)
 
 /** 금아마스크WHITE */
 const product = 'https://smartstore.naver.com/kumaelectron/products/4922095600'
+/** 금아덴탈마스크 */
+const product2 = 'https://smartstore.naver.com/kumaelectron/products/4754238400'
 /** 금아 블랙마스크 */
-const product2 = 'https://smartstore.naver.com/kumaelectron/products/4813999869'
+const product3 = 'https://smartstore.naver.com/kumaelectron/products/4813999869'
 const test_product = 'https://smartstore.naver.com/kumaelectron/products/4836415470'
 
 const browserOptions = {
@@ -102,7 +104,7 @@ const buyProduct = async (page) => {
       } else {
         if (await page.$('div.module_error')) {
           console.log('error page')
-          await page.waitFor(10000)
+          await page.waitFor(30000)
           await page.goto(product)
         } else {
           console.log('for sale')
