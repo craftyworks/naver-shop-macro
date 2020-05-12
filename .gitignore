@@ -1,3 +1,5 @@
 node_modules
 .idea
 run.bat
+local/*.png
+local/*.html

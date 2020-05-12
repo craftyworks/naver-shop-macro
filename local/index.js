@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer');
+const fs = require('fs')
 const userId = process.env.naver_id
 const password = process.env.naver_password
 console.log(`[${userId}], [${password}]`)
@@ -20,6 +21,17 @@ const browserOptions = {
     '--disable-setuid-sandbox'
   ],
   ignoreDefaultArgs: ['--disable-extensions']
+}
+
+const getTime = () => new Date().toISOString().slice(0, 19).replace(/[^0-9]/g, '')
+
+const saveScreenshot = async(page, fileName) => {
+  await page.screenshot({path: `${fileName}.png`, fullPage: true});
+
+  const html = await page.content()
+  await fs.writeFile(`${fileName}.html`, html, (err) => {})
+
+  console.log('saveScreenshot', fileName)
 }
 
 /** 네이버 로그인 */
@@ -109,14 +121,13 @@ const buyProduct = async (page) => {
         } else {
           console.log('for sale')
           success = await buyProduct(page)
+          await saveScreenshot(page, `${getTime()}_${result}`)
         }
       }
     }
   } catch (err) {
     console.error(err)
-    const html = await page.content();
-    console.log(html)
-    await page.screenshot({path: Math.random() + '.png', fullPage: true});
+    await saveScreenshot(page, getTime() + '_error')
   } finally {
     if (page != null) {
       for (let page of await browser.pages()) {
