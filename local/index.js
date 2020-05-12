@@ -3,8 +3,10 @@ const userId = process.env.naver_id
 const password = process.env.naver_password
 console.log(`[${userId}], [${password}]`)
 
+/** 금아마스크WHITE */
+const product = 'https://smartstore.naver.com/kumaelectron/products/4922095600'
 /** 금아 블랙마스크 */
-const product = 'https://smartstore.naver.com/kumaelectron/products/4813999869'
+const product2 = 'https://smartstore.naver.com/kumaelectron/products/4813999869'
 const test_product = 'https://smartstore.naver.com/kumaelectron/products/4836415470'
 
 const browserOptions = {
