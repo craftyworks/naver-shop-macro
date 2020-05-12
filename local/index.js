@@ -100,12 +100,21 @@ const buyProduct = async (page) => {
       if (await page.$('div.not_goods')) {
         console.log('sold out!')
       } else {
-        console.log('for sale')
-        success = await buyProduct(page)
+        if (await page.$('div.module_error')) {
+          console.log('error page')
+          await page.waitFor(10000)
+          await page.goto(product)
+        } else {
+          console.log('for sale')
+          success = await buyProduct(page)
+        }
       }
     }
   } catch (err) {
     console.error(err)
+    const html = await page.content();
+    console.log(html)
+    await page.screenshot({path: Math.random() + '.png', fullPage: true});
   } finally {
     if (page != null) {
       for (let page of await browser.pages()) {
