@@ -1,0 +1,28 @@
+service: aws-lambda-dental
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage, 'dev'}
+  region: ap-northeast-2
+  environment:
+    stage: ${self:provider.stage}
+    naver_id: ${file(./config.${self:provider.stage}.json):naver_id}
+    naver_password: ${file(./config.${self:provider.stage}.json):naver_password}
+    s3_region: ${file(./config.${self:provider.stage}.json):s3_region}
+    s3_bucket: ${file(./config.${self:provider.stage}.json):s3_bucket}
+package:
+  exclude:
+    - node_modules/puppeteer/.local-chromium/**
+
+functions:
+  macro:
+    handler: src/index.macro
+    memorySize: 1536
+    timeout: 30
+    events:
+      - schedule: cron(* 0-8 ? * MON-SAT *)
+      - http:
+          path: macro
+          method: get
+
+
