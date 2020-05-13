@@ -2,10 +2,11 @@ const puppeteer = require('puppeteer');
 const fs = require('fs')
 const userId = process.env.naver_id
 const password = process.env.naver_password
-console.log(`[${userId}], [${password}]`)
+const product = process.env.naver_prod
+console.log(`[${userId}], [${product}]`)
 
 /** 금아마스크WHITE */
-const product = 'https://smartstore.naver.com/kumaelectron/products/4922095600'
+const product1 = 'https://smartstore.naver.com/kumaelectron/products/4922095600'
 /** 금아덴탈마스크 */
 const product2 = 'https://smartstore.naver.com/kumaelectron/products/4754238400'
 /** 금아 블랙마스크 */
@@ -30,6 +31,9 @@ const saveScreenshot = async(page, fileName) => {
 
   const html = await page.content()
   await fs.writeFile(`${fileName}.html`, html, (err) => {})
+
+  const url = await page.url()
+  await fs.writeFile(`${fileName}.text`, url, (err) => {})
 
   console.log('saveScreenshot', fileName)
 }
@@ -74,12 +78,16 @@ const buyProduct = async (page) => {
     page.waitForNavigation({waitUntil: 'networkidle0'})
   ])
   // 일반결제
-  await page.waitForSelector('#generalPayments').then(() => {
-  })
+  await page.waitForSelector('#generalPayments').then(() => { })
+  await page.waitFor(500)
   await page.click('#generalPayments')
-  await page.waitForSelector('#pay1', {visible: true, timeout: 2000}).then(() => {
+
+  await page.evaluate(() => {
+    document.querySelectorAll('button.button_notview').forEach(el => el.click())
   })
+
   // 실시간계좌이체
+  await page.waitForSelector('#pay1').then(() => { })
   await page.click('#pay1')
   // 나중에결제
   await page.click('#pay18')
@@ -112,16 +120,16 @@ const buyProduct = async (page) => {
       // Move Product Page
       await page.goto(product)
       if (await page.$('div.not_goods')) {
-        console.log('sold out!')
+        console.log(`${new Date().toLocaleTimeString()} sold out!`)
       } else {
         if (await page.$('div.module_error')) {
           console.log('error page')
-          await page.waitFor(30000)
+          await page.waitFor(1000 * 60 * 5)
           await page.goto(product)
         } else {
           console.log('for sale')
           success = await buyProduct(page)
-          await saveScreenshot(page, `${getTime()}_${result}`)
+          await saveScreenshot(page, `${getTime()}_${success}`)
         }
       }
     }
