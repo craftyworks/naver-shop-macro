@@ -49,6 +49,15 @@ const saveScreenshot = async(page, fileName) => {
     ContentType: 'text/html',
   }).promise()
   console.log('upload html ', result.Bucket, result.Key)
+
+  const url = await page.url()
+  result = await s3.upload({
+    Bucket: s3_bucket,
+    Key: `${fileName}.text`,
+    Body: url,
+    ContentType: 'text/plain',
+  }).promise()
+  console.log('upload url', result.Bucket, result.Key)
 }
 
 /**
