@@ -14,7 +14,7 @@ const product3 = 'https://smartstore.naver.com/kumaelectron/products/4813999869'
 const test_product = 'https://smartstore.naver.com/kumaelectron/products/4836415470'
 
 const browserOptions = {
-  headless: true,
+  headless: false,
   devtools: false,
   defaultViewport: {width: 1900, height: 900},
   args: [
@@ -93,7 +93,16 @@ const buyProduct = async (page) => {
   await page.click('#pay18')
   // 전체 동의하기
   await page.click('#allAgree')
+
+  await page.evaluate(() => {
+    document.querySelector('#pay1').click()
+    document.querySelector('#pay18').click()
+    document.querySelector('label[for=all_agree]').click()
+  })
+
+  // 구매하기
   await page.click('button.btn_payment')
+
   await page.waitForNavigation({waitUntil: 'networkidle0'})
 
   if (await page.$('.order_number')) {
@@ -101,6 +110,10 @@ const buyProduct = async (page) => {
     console.log('Order No : %s', orderNo)
     return true
   }
+
+  const url = await page.url()
+  await fs.writeFile(`${getTime()}_url.text`, url, (err) => {})
+
   return false
 }
 
@@ -132,6 +145,16 @@ const buyProduct = async (page) => {
           await saveScreenshot(page, `${getTime()}_${success}`)
         }
       }
+      // thinking time (평일 9~16시 25~30분, 55분~60분만 공략)
+      let thinkTime = 5 * 60 * 1000 /* 5 minutes */
+      let day = new Date().getDay()
+      let hh = new Date().getHours()
+      const mm = new Date().getMinutes() % 30
+      if( day > 0 && day < 6 && hh >= 9 && hh <= 16 && mm >= 25) {
+        thinkTime = 2000
+      }
+      console.log('thinkTime : ', thinkTime)
+      await page.waitFor(thinkTime)
     }
   } catch (err) {
     console.error(err)
