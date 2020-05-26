@@ -14,7 +14,7 @@ const product3 = 'https://smartstore.naver.com/kumaelectron/products/4813999869'
 const test_product = 'https://smartstore.naver.com/kumaelectron/products/4836415470'
 
 const browserOptions = {
-  headless: true,
+  headless: false,
   devtools: false,
   defaultViewport: {width: 1900, height: 900},
   args: [
@@ -74,9 +74,11 @@ const naverLogin = async (page) => {
 /** 상품 결제 */
 const buyProduct = async (page) => {
   await Promise.all([
+    page.waitForNavigation(),
     page.click('span.buy > a'),
     page.waitForNavigation({waitUntil: 'networkidle0'})
   ])
+
   // 일반결제
   await page.waitForSelector('#generalPayments').then(() => { })
   await page.waitFor(500)
@@ -87,13 +89,19 @@ const buyProduct = async (page) => {
   })
 
   // 실시간계좌이체
-  await page.waitForSelector('#pay1').then(() => { })
-  await page.click('#pay1')
   // 나중에결제
-  await page.click('#pay18')
   // 전체 동의하기
-  await page.click('#allAgree')
+
+  await page.waitForSelector('#pay1').then(() => { })
+  await page.evaluate(() => {
+    document.querySelector('#pay1').click()
+    document.querySelector('#pay18').click()
+    document.querySelector('label[for=all_agree]').click()
+  })
+
+  // 구매하기
   await page.click('button.btn_payment')
+
   await page.waitForNavigation({waitUntil: 'networkidle0'})
 
   if (await page.$('.order_number')) {
@@ -101,6 +109,10 @@ const buyProduct = async (page) => {
     console.log('Order No : %s', orderNo)
     return true
   }
+
+  const url = await page.url()
+  await fs.writeFile(`${getTime()}_url.text`, url, (err) => {})
+
   return false
 }
 
@@ -132,6 +144,18 @@ const buyProduct = async (page) => {
           await saveScreenshot(page, `${getTime()}_${success}`)
         }
       }
+      // thinking time (평일 9~16시 25~35분, 55분~05분만 공략)
+      let thinkTime = 5 * 60 * 1000 /* 5 minutes */
+      let day = new Date().getDay()
+      let hh = new Date().getHours()
+      const mm = new Date().getMinutes()
+      if( day > 0 && day < 6
+        && hh >= 9 && hh <= 16
+        && (mm % 30 <= 5 || mm % 30 >= 25)) {
+        thinkTime = 1000
+      }
+      console.log('thinkTime : ', thinkTime)
+      await page.waitFor(thinkTime)
     }
   } catch (err) {
     console.error(err)
