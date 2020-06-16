@@ -1,6 +1,6 @@
 node_modules
 .idea
-run.bat
+run*.bat
 local/*.png
 local/*.html
 local/*.text
