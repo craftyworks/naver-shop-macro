@@ -79,6 +79,10 @@ const buyProduct = async (page) => {
     page.waitForNavigation({waitUntil: 'networkidle0'})
   ])
 
+    page.on('dialog', async dialog => {
+      await dialog.accept();
+    });
+	
   // 일반결제
   await page.waitForSelector('#generalPayments').then(() => { })
   await page.waitFor(500)
@@ -92,10 +96,10 @@ const buyProduct = async (page) => {
   // 나중에결제
   // 전체 동의하기
 
-  await page.waitForSelector('#pay1').then(() => { })
+  await page.waitForSelector('#pay19').then(() => { })
   await page.evaluate(() => {
-    document.querySelector('#pay1').click()
-    document.querySelector('#pay18').click()
+    //document.querySelector('#pay1').click()
+    document.querySelector('#pay19').click()
     document.querySelector('label[for=all_agree]').click()
   })
 

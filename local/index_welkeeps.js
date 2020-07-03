@@ -35,7 +35,8 @@ const naverLogin = async (page) => {
   try {
     await page.goto('https://www.naver.com')
     await page.click('#account > a.link_login')
-
+	await page.waitFor(500)
+	
     // await page.type('#id', userId)
     // await page.type('#pw', password)
     /* 네이버 CAPTCHA 무력화 */
@@ -71,6 +72,10 @@ const buyProduct = async (page) => {
     page.waitForNavigation({waitUntil: 'networkidle0'})
   ])
 
+    page.on('dialog', async dialog => {
+      await dialog.accept();
+    });
+	
   // 일반결제
   await page.waitForSelector('#generalPayments').then(() => { })
   await page.waitFor(500)
@@ -123,11 +128,6 @@ const buyProduct = async (page) => {
       // Move Product Page
       await page.goto(product)
 
-      // 구매수량 10개
-      const prodCnt = await page.$('#cuid_0');
-      await prodCnt.click({ clickCount: 3 })
-      await prodCnt.type("10");
-
       if (await page.$('div.not_goods')) {
         console.log(`${new Date().toLocaleTimeString()} sold out!`)
       } else {
@@ -137,6 +137,12 @@ const buyProduct = async (page) => {
           await page.goto(product)
         } else {
           console.log('for sale')
+
+	  // 구매수량 10개
+      const prodCnt = await page.$('#cuid_0');
+      await prodCnt.click({ clickCount: 3 })
+      await prodCnt.type("10");
+	  
           success = await buyProduct(page)
           await saveScreenshot(page, `${getTime()}_${success}`)
         }
